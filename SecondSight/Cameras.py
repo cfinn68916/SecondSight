@@ -165,6 +165,7 @@ class Camera:
 
 class CameraManager:
     camera_cache = []
+    cap_time=0
 
     @classmethod
     def loadCameras(cls) -> None:
@@ -196,8 +197,13 @@ class CameraManager:
         """
         Update all the cameras
         """
+        cls.cap_time = time.time()
         for cam in cls.getCameras():
             cam.update()
+
+    @classmethod
+    def getTimeSinceCapture(cls):
+        return time.time()-cls.cap_time
 
 
 if __name__ == "__main__":

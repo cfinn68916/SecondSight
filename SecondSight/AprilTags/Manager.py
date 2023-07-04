@@ -15,11 +15,16 @@ class ApriltagManager:
 
     def __init__(self):
         self.current_apriltags: List[SecondSight.AprilTags.Detector.ApriltagDetection] = []
+        self.current_field_pos: tuple[float, float, float] = (-1, -1, -1)
         self.april_table = networktables.NetworkTables.getTable('SecondSight').getSubTable('Apriltags')
         self.fetchApriltags()
 
     def fetchApriltags(self):
         res = []
+        year: str = ''
+        for i in SecondSight.config.Configuration().get_value('detects'):
+            if i.startswith('apriltags'):
+                year = i.strip('apriltags')
         cams = SecondSight.Cameras.CameraManager.getCameras()
         executor = concurrent.futures.ThreadPoolExecutor(max_workers=len(cams))
         futures = {}
@@ -32,6 +37,9 @@ class ApriltagManager:
                 for det in dets:
                     res.append(det)
         self.current_apriltags = res
+        if len(res) >= 1:
+            res[0].calcFieldPos(year)
+            self.current_field_pos = (res[0].field_x, res[0].field_y, res[0].field_yaw)
 
     def getApriltags(self):
         return self.current_apriltags
@@ -46,3 +54,7 @@ class ApriltagManager:
                             det['distance_std'], det['left_right_std'], det['yaw_std'], det['rms'], det['error'],
                             det['tagid']]
             self.april_table.putNumberArray('relative_positions', nt_send)
+            self.april_table.putNumber('field_x', self.current_field_pos[0])
+            self.april_table.putNumber('field_y', self.current_field_pos[1])
+            self.april_table.putNumber('field_ang', self.current_field_pos[2])
+            self.april_table.putNumber('time', SecondSight.Cameras.CameraManager.getTimeSinceCapture())
