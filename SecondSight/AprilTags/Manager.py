@@ -30,8 +30,6 @@ class ApriltagManager:
             dets = future.result()
             if dets:
                 for det in dets:
-                    det = det.json(error=True)
-                    det['camera'] = i
                     res.append(det)
         self.current_apriltags = res
 
@@ -43,8 +41,8 @@ class ApriltagManager:
         if config.get_value('detects') is not None and "apriltags" in [i[:min(len(i) - 1, 9)] for i in config.get_value('detects')]:
             nt_send = []
             for det in self.current_apriltags:
-                det = det.json()
+                det = det.json(error=True)
                 nt_send += [det['distance'], det['left_right'], det['up_down'], det['pitch'], det['roll'], det['yaw'],
                             det['distance_std'], det['left_right_std'], det['yaw_std'], det['rms'], det['error'],
-                            det['tagid'], det['camera']]
+                            det['tagid']]
             self.april_table.putNumberArray('relative_positions', nt_send)
