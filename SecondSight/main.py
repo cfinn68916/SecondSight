@@ -41,6 +41,8 @@ def main_cli():
     lastframetime = 0
     apriltag_manager = SecondSight.AprilTags.Manager.ApriltagManager.getInst()
     cams = SecondSight.Cameras.CameraManager.getCameras()
+    recording_manager = SecondSight.Recording.RecordingManager.getInst()
+    recording_manager.startRecording()
     while True:
         # Only run the loop every 100ms
         newtime = time.time()
@@ -56,6 +58,7 @@ def main_cli():
         apriltag_manager.fetchApriltags()
         apriltag_manager.postApriltags()
         app.game_pieces = SecondSight.Color.postGamePieces(conecube_table, cams, config.get_value('detects'))
+        recording_manager.step()
 
 
 if __name__ == "__main__":
