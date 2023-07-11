@@ -11,6 +11,7 @@ tag_size = 6
 
 class ApriltagDetection:
     def __init__(self, yaw, pitch, roll, left_right, up_down, distance, rms, tagid):
+        logging.debug(f'ApriltagDetection.__init__({yaw}, {pitch}, {roll}, {left_right}, {up_down}, {distance}, {rms}, {tagid})')
         self.yaw = yaw
         self.pitch = pitch
         self.roll = roll
@@ -154,7 +155,6 @@ def getPosition(img, camera_matrix, dist_coefficients, valid_tags=range(1, 9), c
             up_down = -translation_vector[0][1] * 2.54
             distance = translation_vector[0][2] * 2.54
 
-            logging.info(f'april pos: yaw:{str(yaw)[:5]}, lr:{str(left_right)[:7]}, distance:{str(distance)[:7]}, rms:{rms}, tag:{tagid}')
             detections.append(ApriltagDetection(yaw, pitch, roll, left_right[0], up_down[0], distance[0], rms[0][0], tagid))
     return detections
 

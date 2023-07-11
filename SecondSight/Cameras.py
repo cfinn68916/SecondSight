@@ -196,6 +196,7 @@ class CameraManager:
         """
         Update all the cameras
         """
+        logging.debug(f'CameraManager.updateAll()')
         for cam in cls.getCameras():
             cam.update()
 
