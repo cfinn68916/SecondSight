@@ -71,7 +71,7 @@ def getRelativePosition(det, camera_matrix, dist_coefficients):
     good, rotation_vector, translation_vector, _ = cv2.solvePnPGeneric(object_pts, image_points,
                                                                        camera_matrix,
                                                                        dist_coefficients,
-                                                                       flags=cv2.SOLVEPNP_IPPE_SQUARE)
+                                                                       flags=cv2.SOLVEPNP_ITERATIVE)
     assert good, 'something went wrong with solvePnP'
 
     # Map rotation_vector
@@ -87,14 +87,15 @@ def getRelativePosition(det, camera_matrix, dist_coefficients):
 def getFieldPosition(dets, camera_matrix, dist_coefficients):
     image_points = np.array([i[0] for i in dets]).reshape(1, 4 * len(dets), 2)
 
-    object_pts = np.array([SecondSight.AprilTags.Positions.apriltagFeatures['2023'][str(i[1])] for i in dets])  # TODO: make year configured
+    q=SecondSight.AprilTags.Positions.apriltagFeatures['2023']  # TODO: make year configured
+    q2=[q[str(i[1])][:4] for i in dets]
+    object_pts = np.array(q2).reshape(1, 4 * len(dets), 3)
 
     # Solve for rotation and translation
     good, rotation_vector, translation_vector, _ = cv2.solvePnPGeneric(object_pts, image_points,
                                                                        camera_matrix,
                                                                        dist_coefficients,
-
-                                                                       flags=cv2.SOLVEPNP_IPPE)
+                                                                       flags=cv2.SOLVEPNP_ITERATIVE)
     assert good, 'something went wrong with solvePnP'
 
 
@@ -114,7 +115,5 @@ def getFieldPosition(dets, camera_matrix, dist_coefficients):
     return PoseEstimate(-yaw, pitch, -roll, y, z, x, None),PoseEstimate(-yaw2, pitch2, -roll2, y2, z2, x2, None)
 
 
-if __name__ == "main":
-    pass
-else:
+if __name__ == "__main__":
     pass
